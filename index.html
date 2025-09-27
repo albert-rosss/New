@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mrs.ai💖</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; background: linear-gradient(135deg, #ffe3e3, #ffd1dc);}
+.widget, .celebration { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); width: 90%; max-width: 400px; background: white; transition: opacity 0.5s ease; }
+.celebration { display: none; background: linear-gradient(135deg, #ffdde1, #ee9ca7); color: white; }
+h2 { font-size: 1.3rem; color:#333; }
+h1 { margin-top: 15%; font-size: 2rem; }
+.quote { margin-top: 5%; font-size: 1.5rem; font-weight: bold; padding: 10px; }
+.btn { padding: 12px 20px; margin: 10px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; width: 100%; max-width: 200px; }
+#yesBtn { background: #ff6f91; color: white; }
+#noBtn { background: #ff3f4b; color: white; opacity: 1; transition: opacity 0.5s; }
+#checkBtn { position: fixed; bottom: 10px; left: 10px; background: rgba(0,0,0,0.3); color: white; font-size: 10px; padding: 4px 6px; border-radius: 5px; cursor: pointer; z-index: 1000; }
+#responseLog { position: fixed; bottom: 30px; left: 10px; width: 200px; max-height: 250px; overflow-y: auto; background: #fff; color: #000; padding: 8px; border-radius: 8px; font-size: 11px; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 999; }
+.concerts { position: absolute; top: 50%; transform: translateY(-50%); width: 120px; max-width: 25%; border-radius:10px; }
+.left { left: 5px; }
+.right { right: 5px; }
+canvas { position: fixed; top: 0; left: 0; pointer-events: none; }
+#noMessage { margin-top:10px; color:#ff3f4b; font-weight:bold; }
+@media(max-width:600px){ h1{ font-size:1.5rem; margin-top:25%; } h2{ font-size:1.1rem; } .btn{ font-size:16px; padding:10px; } .concerts{ width:90px; } .quote{ font-size:1.2rem; margin-top:20%; } #checkBtn{ font-size:9px; padding:3px 5px; } #responseLog{ width:180px; font-size:10px; } }
+</style>
+</head>
+<body>
+
+<div class="widget" id="widget">
+  <h2>Heey, i don't know how things will work between us but i just want to be a part in your life where i have  a special place, and i want us to be more close so that you will be more close and open with me. As we talked  before, so i guess you won't have any bad idea about this,and i really would love to be a part of each if your moments and would love to hear your daily stories,memories thougts and your dreams.I swear i won't make fun of you even if its weird or anything,and tbh i really miss your sweet voice.I just loved when you just invest time for me and i woukd love to talk to you daily. I don't know how you to impress you haha i just thought i would ask you so that i can get more time with you, like i will get more priority and i will have a special high space in your heart.So.....</h2>
+  <h2>Can we have a date?💖</h2>
+  <button class="btn" id="yesBtn">Yes</button>
+  <button class="btn" id="noBtn">No</button>
+  <div id="noMessage"></div>
+</div>
+
+<div class="celebration" id="celebration">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Coldplay_Viva_La_Vida_Tour.jpg" class="concerts left" alt="Coldplay Concert">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Taylor_Swift_Red_Tour_2013.jpg" class="concerts right" alt="Taylor Swift Concert">
+  <h1>🎉 WOOOW! 🎉</h1>
+  <div class="quote">"Being with you is the greatest joy, and I promise to make you the happiest I can 💕"</div>
+  <canvas id="confetti"></canvas>
+</div>
+
+<button id="checkBtn">☑</button>
+<div id="responseLog"></div>
+
+<!-- Royalty-free romantic song -->
+<audio id="song" preload="none">
+  <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+<script>
+// --- Clear old logs on load ---
+localStorage.removeItem("apologyLogs");
+
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const widget = document.getElementById("widget");
+const celebration = document.getElementById("celebration");
+const checkBtn = document.getElementById("checkBtn");
+const responseLog = document.getElementById("responseLog");
+const noMessage = document.getElementById("noMessage");
+let noClicks = 0;
+const song = document.getElementById("song");
+
+// --- Log response with IP ---
+async function logResponseWithIP(choice){
+  let ip = "Unknown";
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    const data = await res.json();
+    ip = data.ip;
+  } catch(e){ console.warn("Could not get IP", e); }
+
+  const logs = JSON.parse(localStorage.getItem("apologyLogs")) || [];
+  logs.push({
+    choice,
+    timestamp: new Date().toISOString(),
+    ip
+  });
+  localStorage.setItem("apologyLogs", JSON.stringify(logs));
+}
+
+// --- Play song ---
+function playRomanticSong() {
+  song.currentTime = 0;
+  song.play().catch(() => console.warn("Tap Yes to play song"));
+}
+
+// --- Yes / No button logic ---
+yesBtn.addEventListener("click", async ()=>{
+  await logResponseWithIP("Yes");
+  widget.style.opacity = 0;
+  setTimeout(()=>{
+    widget.style.display = "none";
+    celebration.style.display = "block";
+    startConfetti();
+    playRomanticSong();
+  }, 500);
+});
+
+noBtn.addEventListener("click", async ()=>{
+  noClicks++;
+  await logResponseWithIP("No");
+
+  const messages = [
+    "Are you sure? 💔",
+    "Come on, say yes! 😢",
+    "I won't give up! 😘"
+  ];
+  noMessage.textContent = messages[Math.min(noClicks-1, messages.length-1)];
+
+  yesBtn.style.transform = `scale(${1 + noClicks * 0.3})`;
+  noBtn.style.opacity = 1 - noClicks*0.3;
+  if(noClicks>=3) noBtn.remove();
+});
+
+// --- Check responses ---
+checkBtn.addEventListener("click", ()=>{
+  const pwd = prompt("Enter password to view responses:");
+  if(pwd==="jack@123"){
+    const logs = JSON.parse(localStorage.getItem("apologyLogs")) || [];
+    responseLog.innerHTML = logs.length===0 ? "No responses yet." :
+      logs.map(l=>`IP: ${l.ip}<br>${l.timestamp}: ${l.choice}`).join("<hr>");
+    responseLog.style.display="block";
+  } else alert("Incorrect password!");
+});
+
+// --- 3D Romantic Heart Confetti ---
+function startConfetti(){
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const hearts = [];
+  const heartCount = Math.min(40, window.innerWidth / 8);
+
+  class Heart {
+    constructor() { this.reset(); }
+    reset(){
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.z = Math.random() * 200 + 50;
+      this.size = Math.random() * 15 + 10;
+      this.speed = Math.random() * 1.5 + 0.5;
+      this.angle = Math.random() * Math.PI * 2;
+      this.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
+      this.opacity = Math.random() * 0.5 + 0.5;
+    }
+    draw(){
+      const scale = 300 / (300 + this.z);
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.scale(scale, scale);
+      ctx.rotate(this.angle);
+      ctx.globalAlpha = this.opacity;
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.bezierCurveTo(0,-this.size/2,-this.size/2,-this.size/2,-this.size/2,0);
+      ctx.bezierCurveTo(-this.size/2,this.size/2,0,this.size*0.75,0,this.size);
+      ctx.bezierCurveTo(0,this.size*0.75,this.size/2,this.size/2,this.size/2,0);
+      ctx.bezierCurveTo(this.size/2,-this.size/2,0,-this.size/2,0,0);
+      ctx.fillStyle=this.color;
+      ctx.fill();
+      ctx.restore();
+    }
+    update(){
+      this.z -= this.speed;
+      this.angle += 0.01;
+      this.opacity -= 0.002;
+      if(this.z < -100 || this.opacity <=0) { this.reset(); this.z=200; this.opacity=Math.random()*0.5+0.5; }
+    }
+  }
+
+  for(let i=0;i<heartCount;i++) hearts.push(new Heart());
+
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    hearts.forEach(h=>{ h.update(); h.draw(); });
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  window.addEventListener("resize", ()=>{
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+  });
+}
+</script>
+</body>
+</html>
